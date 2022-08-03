@@ -20,11 +20,11 @@ const mesh = new THREE.Mesh(geometry, material)
 scene.add(mesh)
 
 /**
- * Sizes
+ ***** WE USE VIEWPOINT (only the part of the browser that shows the figure)
  */
-const sizes = {
-    width: 800,
-    height: 600
+let sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight
 }
 
 /**
@@ -46,6 +46,39 @@ const renderer = new THREE.WebGLRenderer({
     canvas: canvas
 })
 renderer.setSize(sizes.width, sizes.height)
+
+/*
+*  Resizing (NEW)
+*/
+window.addEventListener('resize', () => {
+    // Update canvas size (viewpoint)
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // Update the camera
+    camera.aspect = sizes.height /sizes.width
+    camera.updateProjectionMatrix() // <- IMPORTANT
+
+    // Update renderer
+    renderer.setSize(sizes.height, sizes.width)
+    // Pixel ration MAX is 2 -for 2022 seems to be enough- (NEW)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+})
+
+/*
+*  Fullscreen (NEW)
+**** Handles Safari and all other browswers **** 
+*/
+window.addEventListener('dblclick', () => {
+    const checkBrowser = document.webkitFullscreenElement || document.fullscreenElement;
+
+    if(!checkBrowser){
+        (canvas.requestFullscreen) ? canvas.requestFullscreen() : canvas.webkitRequestFullscreen();
+    }
+    else {
+        (document.exitFullscreen) ? document.exitFullscreen() : document.webkitExitFullscreen();
+    }
+})
 
 /**
  * Animate
